@@ -1,9 +1,6 @@
 #!/usr/bin/python
 
-try:
-    from analyzemft import mftsession
-except:
-    from .analyzemft import mftsession
+import analyzemft.mftsession as mftsession
 
 if __name__ == "__main__":
     session = mftsession.MftSession()

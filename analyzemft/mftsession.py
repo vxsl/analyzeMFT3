@@ -196,7 +196,7 @@ class MftSession:
         if self.options.output is not None:
             self.file_csv.writerow(mft.mft_to_csv(None, True, self.options))
 
-        while raw_record != "":
+        while raw_record != b"":
             record = mft.parse_record(raw_record, self.options)
             if self.options.debug:
                 print(record)
@@ -276,7 +276,7 @@ class MftSession:
 
         # 1024 is valid for current version of Windows but should really get this value from somewhere
         raw_record = self.file_mft.read(1024)
-        while raw_record != "":
+        while raw_record != b"":
             minirec = {}
             record = mft.parse_record(raw_record, self.options)
             if self.options.debug:
