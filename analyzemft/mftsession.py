@@ -11,6 +11,7 @@
 
 VERSION = "v2.0.18"
 
+import uuid
 import csv
 import json
 import os
@@ -111,9 +112,14 @@ class MftSession:
         else:
             self.options.date_formatter = MftSession.fmt_norm
 
+    def open_data(self, data):
+        self.temp_filename = uuid.uuid4() + '.tmp'
+        with open(self.temp_filename, "wb") as f:
+            f.write(data)
+        self.options.filename = self.temp_filename 
+        self.open_files()
+
     def open_files(self):
-       
-            
         if self.options.version:
             print(("Version is: %s" % VERSION))
             sys.exit()
