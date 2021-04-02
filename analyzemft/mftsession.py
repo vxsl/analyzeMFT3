@@ -252,50 +252,51 @@ class MftSession:
             )
             sys.exit()
 
-    def process_mft_file(self):
+    def process_mft(self, raw_record):
 
-        try:
-            self.sizecheck()
+        #try:
+        # self.sizecheck()
 
-            self.build_filepaths()
+        self.build_filepaths(raw_record)
 
-            # reset the file reading
-            self.num_records = 0
-            self.file_mft.seek(0)
-            raw_record = self.file_mft.read(1024)
+        # reset the file reading
+        self.num_records = 0
+        """ self.file_mft.seek(0)
+        raw_record = self.file_mft.read(1024) """
 
-            if self.options.output is not None:
-                self.file_csv.writerow(mft.mft_to_csv(None, True, self.options))
+        if self.options.output is not None:
+            self.file_csv.writerow(mft.mft_to_csv(None, True, self.options))
 
-            while raw_record != b"":
-                record = mft.parse_record(raw_record, self.options)
-                if self.options.debug:
-                    print(record)
+        # while raw_record != b"":
+        record = mft.parse_record(raw_record, self.options)
+        if self.options.debug:
+            print(record)
 
-                record["filename"] = self.mft[self.num_records]["filename"]
+        record["filename"] = self.mft[self.num_records]["filename"]
 
-                self.do_output(record)
+        # self.do_output(record)
 
-                self.num_records += 1
+        # self.num_records += 1
 
-                if record["ads"] > 0:
-                    for i in range(0, record["ads"]):
-                        #                         print "ADS: %s" % (record['data_name', i])
-                        record_ads = record.copy()
-                        record_ads["filename"] = (
-                            record["filename"] + ":" + record["data_name", i]
-                        )
-                        self.do_output(record_ads)
+        if record["ads"] > 0:
+            for i in range(0, record["ads"]):
+                #                         print "ADS: %s" % (record['data_name', i])
+                record_ads = record.copy()
+                record_ads["filename"] = (
+                    record["filename"] + ":" + record["data_name", i]
+                )
+                self.do_output(record_ads)
 
-                raw_record = self.file_mft.read(1024)
+        # raw_record = self.file_mft.read(1024)
 
-            self.file_mft.close()
-            os.remove(self.options.filename)
-            return record
-        except:
-            self.file_mft.close()
-            os.remove(self.options.filename)
-            raise
+        """ self.file_mft.close()
+        os.remove(self.options.filename) """
+        return record
+        """ except:
+            # self.file_mft.close()
+            # os.remove(self.options.filename)
+            #print(sys.exc_info()[0])
+            raise """
 
     def do_output(self, record):
 
@@ -351,51 +352,48 @@ class MftSession:
 
             raw_record = self.file_mft.read(1024)
 
-    def build_filepaths(self):
+    def build_filepaths(self, raw_record):
         # reset the file reading
-        self.file_mft.seek(0)
+        # self.file_mft.seek(0)
 
         self.num_records = 0
 
         # 1024 is valid for current version of Windows but should really get this value from somewhere
-        raw_record = self.file_mft.read(1024)
-        while raw_record != b"":
-            minirec = {}
-            record = mft.parse_record(raw_record, self.options)
-            if self.options.debug:
-                print(record)
+        # raw_record = self.file_mft.read(1024)
+        # while raw_record != b"":
+        minirec = {}
+        record = mft.parse_record(raw_record, self.options)
+        if self.options.debug:
+            print(record)
 
-            minirec["filename"] = record["filename"]
-            minirec["fncnt"] = record["fncnt"]
-            if record["fncnt"] == 1:
-                minirec["par_ref"] = record["fn", 0]["par_ref"]
-                minirec["name"] = record["fn", 0]["name"]
-            if record["fncnt"] > 1:
-                minirec["par_ref"] = record["fn", 0]["par_ref"]
-                for i in (0, record["fncnt"] - 1):
-                    # print record['fn',i]
-                    if (
-                        record["fn", i]["nspace"] == 0x1
-                        or record["fn", i]["nspace"] == 0x3
-                    ):
-                        minirec["name"] = record["fn", i]["name"]
-                if minirec.get("name") is None:
-                    minirec["name"] = record["fn", record["fncnt"] - 1]["name"]
+        minirec["filename"] = record["filename"]
+        minirec["fncnt"] = record["fncnt"]
+        if record["fncnt"] == 1:
+            minirec["par_ref"] = record["fn", 0]["par_ref"]
+            minirec["name"] = record["fn", 0]["name"]
+        if record["fncnt"] > 1:
+            minirec["par_ref"] = record["fn", 0]["par_ref"]
+            for i in (0, record["fncnt"] - 1):
+                # print record['fn',i]
+                if record["fn", i]["nspace"] == 0x1 or record["fn", i]["nspace"] == 0x3:
+                    minirec["name"] = record["fn", i]["name"]
+            if minirec.get("name") is None:
+                minirec["name"] = record["fn", record["fncnt"] - 1]["name"]
 
-            self.mft[self.num_records] = minirec
+        self.mft[self.num_records] = minirec
 
-            if self.options.progress:
-                if self.num_records % (self.mftsize / 5) == 0 and self.num_records > 0:
-                    print(
-                        "Building Filepaths: {0:.0f}".format(
-                            100.0 * self.num_records / self.mftsize
-                        )
-                        + "%"
+        if self.options.progress:
+            if self.num_records % (self.mftsize / 5) == 0 and self.num_records > 0:
+                print(
+                    "Building Filepaths: {0:.0f}".format(
+                        100.0 * self.num_records / self.mftsize
                     )
+                    + "%"
+                )
 
-            self.num_records += 1
+        self.num_records += 1
 
-            raw_record = self.file_mft.read(1024)
+        # raw_record = self.file_mft.read(1024)
 
         self.gen_filepaths()
 
