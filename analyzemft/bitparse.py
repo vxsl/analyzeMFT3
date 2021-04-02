@@ -27,4 +27,4 @@ def parse_little_endian_signed(buf):
         else:
             return parse_little_endian_signed_negative(buf)
     except Exception:
-        return ''
+        return ""

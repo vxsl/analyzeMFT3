@@ -36,7 +36,6 @@ class MftSession:
     def fmt_norm(date_str):
         return date_str
 
-
     def __init__(self):
         self.mft = {}
         self.fullmft = {}
@@ -47,65 +46,126 @@ class MftSession:
     def mft_options(self):
 
         parser = OptionParser()
-        parser.set_defaults(inmemory=False, debug=False, UseLocalTimezone=False, UseGUI=False)
+        parser.set_defaults(
+            inmemory=False, debug=False, UseLocalTimezone=False, UseGUI=False
+        )
 
-        parser.add_option("-v", "--version", action="store_true", dest="version",
-                          help="report version and exit")
+        parser.add_option(
+            "-v",
+            "--version",
+            action="store_true",
+            dest="version",
+            help="report version and exit",
+        )
 
-        parser.add_option("-f", "--file", dest="filename",
-                          help="read MFT from FILE", metavar="FILE")
+        parser.add_option(
+            "-f", "--file", dest="filename", help="read MFT from FILE", metavar="FILE"
+        )
 
-        parser.add_option("-j", "--json",
-                          dest="json",
-                          help="File paths should use the windows path separator instead of linux")        
-        
-        parser.add_option("-o", "--output", dest="output",
-                          help="write results to FILE", metavar="FILE")
+        parser.add_option(
+            "-j",
+            "--json",
+            dest="json",
+            help="File paths should use the windows path separator instead of linux",
+        )
 
-        parser.add_option("-a", "--anomaly",
-                          action="store_true", dest="anomaly",
-                          help="turn on anomaly detection")
+        parser.add_option(
+            "-o",
+            "--output",
+            dest="output",
+            help="write results to FILE",
+            metavar="FILE",
+        )
 
-        parser.add_option("-e", "--excel",
-                          action="store_true", dest="excel",
-                          help="print date/time in Excel friendly format")
+        parser.add_option(
+            "-a",
+            "--anomaly",
+            action="store_true",
+            dest="anomaly",
+            help="turn on anomaly detection",
+        )
 
-        parser.add_option("-b", "--bodyfile", dest="bodyfile",
-                          help="write MAC information to bodyfile", metavar="FILE")
+        parser.add_option(
+            "-e",
+            "--excel",
+            action="store_true",
+            dest="excel",
+            help="print date/time in Excel friendly format",
+        )
 
-        parser.add_option("--bodystd", action="store_true", dest="bodystd",
-                          help="Use STD_INFO timestamps for body file rather than FN timestamps")
+        parser.add_option(
+            "-b",
+            "--bodyfile",
+            dest="bodyfile",
+            help="write MAC information to bodyfile",
+            metavar="FILE",
+        )
 
-        parser.add_option("--bodyfull", action="store_true", dest="bodyfull",
-                          help="Use full path name + filename rather than just filename")
+        parser.add_option(
+            "--bodystd",
+            action="store_true",
+            dest="bodystd",
+            help="Use STD_INFO timestamps for body file rather than FN timestamps",
+        )
 
-        parser.add_option("-c", "--csvtimefile", dest="csvtimefile",
-                          help="write CSV format timeline file", metavar="FILE")
+        parser.add_option(
+            "--bodyfull",
+            action="store_true",
+            dest="bodyfull",
+            help="Use full path name + filename rather than just filename",
+        )
 
-        parser.add_option("-l", "--localtz",
-                          action="store_true", dest="localtz",
-                          help="report times using local timezone")
+        parser.add_option(
+            "-c",
+            "--csvtimefile",
+            dest="csvtimefile",
+            help="write CSV format timeline file",
+            metavar="FILE",
+        )
 
-        parser.add_option("-d", "--debug",
-                          action="store_true", dest="debug",
-                          help="turn on debugging output")
+        parser.add_option(
+            "-l",
+            "--localtz",
+            action="store_true",
+            dest="localtz",
+            help="report times using local timezone",
+        )
 
-        parser.add_option("-s", "--saveinmemory",
-                          action="store_true", dest="inmemory",
-                          help="Save a copy of the decoded MFT in memory. Do not use for very large MFTs")
+        parser.add_option(
+            "-d",
+            "--debug",
+            action="store_true",
+            dest="debug",
+            help="turn on debugging output",
+        )
 
-        parser.add_option("-p", "--progress",
-                          action="store_true", dest="progress",
-                          help="Show systematic progress reports.")
+        parser.add_option(
+            "-s",
+            "--saveinmemory",
+            action="store_true",
+            dest="inmemory",
+            help="Save a copy of the decoded MFT in memory. Do not use for very large MFTs",
+        )
 
-        parser.add_option("-w", "--windows-path",
-                          action="store_true", dest="winpath",
-                          help="File paths should use the windows path separator instead of linux")
-        
-        
+        parser.add_option(
+            "-p",
+            "--progress",
+            action="store_true",
+            dest="progress",
+            help="Show systematic progress reports.",
+        )
+
+        parser.add_option(
+            "-w",
+            "--windows-path",
+            action="store_true",
+            dest="winpath",
+            help="File paths should use the windows path separator instead of linux",
+        )
+
         (self.options, args) = parser.parse_args()
 
-        self.path_sep = '\\' if self.options.winpath else '/'
+        self.path_sep = "\\" if self.options.winpath else "/"
 
         if self.options.excel:
             self.options.date_formatter = MftSession.fmt_excel
@@ -133,28 +193,30 @@ class MftSession:
         #     sys.exit()
 
         try:
-            self.file_mft = open(self.options.filename, 'rb')
+            self.file_mft = open(self.options.filename, "rb")
         except:
             print("Unable to open file: %s" % self.options.filename)
             sys.exit()
 
         if self.options.output is not None:
             try:
-                self.file_csv = csv.writer(open(self.options.output, 'wb'), dialect=csv.excel, quoting=1)
+                self.file_csv = csv.writer(
+                    open(self.options.output, "wb"), dialect=csv.excel, quoting=1
+                )
             except (IOError, TypeError):
                 print("Unable to open file: %s" % self.options.output)
                 sys.exit()
-        
+
         if self.options.bodyfile is not None:
             try:
-                self.file_body = open(self.options.bodyfile, 'w')
+                self.file_body = open(self.options.bodyfile, "w")
             except:
                 print("Unable to open file: %s" % self.options.bodyfile)
                 sys.exit()
 
         if self.options.csvtimefile is not None:
             try:
-                self.file_csv_time = open(self.options.csvtimefile, 'w')
+                self.file_csv_time = open(self.options.csvtimefile, "w")
             except (IOError, TypeError):
                 print("Unable to open file: %s" % self.options.csvtimefile)
                 sys.exit()
@@ -167,7 +229,7 @@ class MftSession:
         self.mftsize = int(os.path.getsize(self.options.filename)) / 1024
 
         if self.options.debug:
-            print('There are %d records in the MFT' % self.mftsize)
+            print("There are %d records in the MFT" % self.mftsize)
 
         if not self.options.inmemory:
             return
@@ -177,7 +239,7 @@ class MftSession:
         sizeinbytes = self.mftsize * 4500
 
         if self.options.debug:
-            print('Need %d bytes of memory to save into memory' % sizeinbytes)
+            print("Need %d bytes of memory to save into memory" % sizeinbytes)
 
         try:
             arr = []
@@ -185,43 +247,47 @@ class MftSession:
                 arr.append(1)
 
         except MemoryError:
-            print('Error: Not enough memory to store MFT in memory. Try running again without -s option')
+            print(
+                "Error: Not enough memory to store MFT in memory. Try running again without -s option"
+            )
             sys.exit()
 
     def process_mft_file(self):
 
         try:
-        self.sizecheck()
+            self.sizecheck()
 
-        self.build_filepaths()
+            self.build_filepaths()
 
-        # reset the file reading
-        self.num_records = 0
-        self.file_mft.seek(0)
-        raw_record = self.file_mft.read(1024)
-
-        if self.options.output is not None:
-            self.file_csv.writerow(mft.mft_to_csv(None, True, self.options))
-
-        while raw_record != b"":
-            record = mft.parse_record(raw_record, self.options)
-            if self.options.debug:
-                print(record)
-
-            record['filename'] = self.mft[self.num_records]['filename']
-
-            self.do_output(record)
-
-            self.num_records += 1
-
-            if record['ads'] > 0:
-                for i in range(0, record['ads']):
-                    #                         print "ADS: %s" % (record['data_name', i])
-                    record_ads = record.copy()
-                    record_ads['filename'] = record['filename'] + ':' + record['data_name', i]
-                    self.do_output(record_ads)
-
+            # reset the file reading
+            self.num_records = 0
+            self.file_mft.seek(0)
             raw_record = self.file_mft.read(1024)
+
+            if self.options.output is not None:
+                self.file_csv.writerow(mft.mft_to_csv(None, True, self.options))
+
+            while raw_record != b"":
+                record = mft.parse_record(raw_record, self.options)
+                if self.options.debug:
+                    print(record)
+
+                record["filename"] = self.mft[self.num_records]["filename"]
+
+                self.do_output(record)
+
+                self.num_records += 1
+
+                if record["ads"] > 0:
+                    for i in range(0, record["ads"]):
+                        #                         print "ADS: %s" % (record['data_name', i])
+                        record_ads = record.copy()
+                        record_ads["filename"] = (
+                            record["filename"] + ":" + record["data_name", i]
+                        )
+                        self.do_output(record_ads)
+
+                raw_record = self.file_mft.read(1024)
 
             self.file_mft.close()
             os.remove(self.options.filename)
@@ -232,32 +298,34 @@ class MftSession:
             raise
 
     def do_output(self, record):
-        
-        
+
         if self.options.inmemory:
             self.fullmft[self.num_records] = record
 
         if self.options.output is not None:
             self.file_csv.writerow(mft.mft_to_csv(record, False, self.options))
-        
-        if self.options.json is not None:    
-            with open(self.options.json, 'a') as outfile:
+
+        if self.options.json is not None:
+            with open(self.options.json, "a") as outfile:
                 json.dump(mft.mft_to_json(record), outfile)
-                outfile.write('\n')
-            
-        
- 
-    
-            
+                outfile.write("\n")
+
         if self.options.csvtimefile is not None:
             self.file_csv_time.write(mft.mft_to_l2t(record))
 
         if self.options.bodyfile is not None:
-            self.file_body.write(mft.mft_to_body(record, self.options.bodyfull, self.options.bodystd))
+            self.file_body.write(
+                mft.mft_to_body(record, self.options.bodyfull, self.options.bodystd)
+            )
 
         if self.options.progress:
             if self.num_records % (self.mftsize / 5) == 0 and self.num_records > 0:
-                print('Building MFT: {0:.0f}'.format(100.0 * self.num_records / self.mftsize) + '%')
+                print(
+                    "Building MFT: {0:.0f}".format(
+                        100.0 * self.num_records / self.mftsize
+                    )
+                    + "%"
+                )
 
     def plaso_process_mft_file(self):
 
@@ -275,7 +343,7 @@ class MftSession:
             if self.options.debug:
                 print(record)
 
-            record['filename'] = self.mft[self.num_records]['filename']
+            record["filename"] = self.mft[self.num_records]["filename"]
 
             self.fullmft[self.num_records] = record
 
@@ -297,25 +365,33 @@ class MftSession:
             if self.options.debug:
                 print(record)
 
-            minirec['filename'] = record['filename']
-            minirec['fncnt'] = record['fncnt']
-            if record['fncnt'] == 1:
-                minirec['par_ref'] = record['fn', 0]['par_ref']
-                minirec['name'] = record['fn', 0]['name']
-            if record['fncnt'] > 1:
-                minirec['par_ref'] = record['fn', 0]['par_ref']
-                for i in (0, record['fncnt'] - 1):
+            minirec["filename"] = record["filename"]
+            minirec["fncnt"] = record["fncnt"]
+            if record["fncnt"] == 1:
+                minirec["par_ref"] = record["fn", 0]["par_ref"]
+                minirec["name"] = record["fn", 0]["name"]
+            if record["fncnt"] > 1:
+                minirec["par_ref"] = record["fn", 0]["par_ref"]
+                for i in (0, record["fncnt"] - 1):
                     # print record['fn',i]
-                    if record['fn', i]['nspace'] == 0x1 or record['fn', i]['nspace'] == 0x3:
-                        minirec['name'] = record['fn', i]['name']
-                if minirec.get('name') is None:
-                    minirec['name'] = record['fn', record['fncnt'] - 1]['name']
+                    if (
+                        record["fn", i]["nspace"] == 0x1
+                        or record["fn", i]["nspace"] == 0x3
+                    ):
+                        minirec["name"] = record["fn", i]["name"]
+                if minirec.get("name") is None:
+                    minirec["name"] = record["fn", record["fncnt"] - 1]["name"]
 
             self.mft[self.num_records] = minirec
 
             if self.options.progress:
                 if self.num_records % (self.mftsize / 5) == 0 and self.num_records > 0:
-                    print('Building Filepaths: {0:.0f}'.format(100.0 * self.num_records / self.mftsize) + '%')
+                    print(
+                        "Building Filepaths: {0:.0f}".format(
+                            100.0 * self.num_records / self.mftsize
+                        )
+                        + "%"
+                    )
 
             self.num_records += 1
 
@@ -328,35 +404,44 @@ class MftSession:
             print("Building Folder For Record Number (%d)" % seqnum)
 
         if seqnum not in self.mft:
-            return 'Orphan'
+            return "Orphan"
 
         # If we've already figured out the path name, just return it
-        if (self.mft[seqnum]['filename']) != '':
-            return self.mft[seqnum]['filename']
+        if (self.mft[seqnum]["filename"]) != "":
+            return self.mft[seqnum]["filename"]
 
         try:
             # if (self.mft[seqnum]['fn',0]['par_ref'] == 0) or
             # (self.mft[seqnum]['fn',0]['par_ref'] == 5):  # There should be no seq
             # number 0, not sure why I had that check in place.
-            if self.mft[seqnum]['par_ref'] == 5:  # Seq number 5 is "/", root of the directory
-                self.mft[seqnum]['filename'] = self.path_sep + self.mft[seqnum]['name']
-                return self.mft[seqnum]['filename']
+            if (
+                self.mft[seqnum]["par_ref"] == 5
+            ):  # Seq number 5 is "/", root of the directory
+                self.mft[seqnum]["filename"] = self.path_sep + self.mft[seqnum]["name"]
+                return self.mft[seqnum]["filename"]
         except:  # If there was an error getting the parent's sequence number, then there is no FN record
-            self.mft[seqnum]['filename'] = 'NoFNRecord'
-            return self.mft[seqnum]['filename']
+            self.mft[seqnum]["filename"] = "NoFNRecord"
+            return self.mft[seqnum]["filename"]
 
         # Self referential parent sequence number. The filename becomes a NoFNRecord note
-        if (self.mft[seqnum]['par_ref']) == seqnum:
+        if (self.mft[seqnum]["par_ref"]) == seqnum:
             if self.debug:
-                print("Error, self-referential, while trying to determine path for seqnum %s" % seqnum)
-            self.mft[seqnum]['filename'] = 'ORPHAN' + self.path_sep + self.mft[seqnum]['name']
-            return self.mft[seqnum]['filename']
+                print(
+                    "Error, self-referential, while trying to determine path for seqnum %s"
+                    % seqnum
+                )
+            self.mft[seqnum]["filename"] = (
+                "ORPHAN" + self.path_sep + self.mft[seqnum]["name"]
+            )
+            return self.mft[seqnum]["filename"]
 
         # We're not at the top of the tree and we've not hit an error
-        parentpath = self.get_folder_path((self.mft[seqnum]['par_ref']))
-        self.mft[seqnum]['filename'] = parentpath + self.path_sep + self.mft[seqnum]['name']
+        parentpath = self.get_folder_path((self.mft[seqnum]["par_ref"]))
+        self.mft[seqnum]["filename"] = (
+            parentpath + self.path_sep + self.mft[seqnum]["name"]
+        )
 
-        return self.mft[seqnum]['filename']
+        return self.mft[seqnum]["filename"]
 
     def gen_filepaths(self):
 
@@ -366,14 +451,14 @@ class MftSession:
             #            else get filename of parent, add it to ours, and we're done.
 
             # If we've not already calculated the full path ....
-            if (self.mft[i]['filename']) == '':
+            if (self.mft[i]["filename"]) == "":
 
-                if self.mft[i]['fncnt'] > 0:
+                if self.mft[i]["fncnt"] > 0:
                     self.get_folder_path(i)
                     # self.mft[i]['filename'] = self.mft[i]['filename'] + '/' +
                     #   self.mft[i]['fn',self.mft[i]['fncnt']-1]['name']
                     # self.mft[i]['filename'] = self.mft[i]['filename'].replace('//','/')
                     if self.debug:
-                        print("Filename (with path): %s" % self.mft[i]['filename'])
+                        print("Filename (with path): %s" % self.mft[i]["filename"])
                 else:
-                    self.mft[i]['filename'] = 'NoFNRecord'
+                    self.mft[i]["filename"] = "NoFNRecord"
