@@ -291,7 +291,7 @@ class MftSession:
 
             self.file_mft.close()
             os.remove(self.options.filename)
-
+            return record
         except:
             self.file_mft.close()
             os.remove(self.options.filename)
