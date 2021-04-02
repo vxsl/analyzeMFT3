@@ -113,10 +113,10 @@ class MftSession:
             self.options.date_formatter = MftSession.fmt_norm
 
     def open_data(self, data):
-        self.temp_filename = uuid.uuid4() + '.tmp'
-        with open(self.temp_filename, "wb") as f:
+        temp_filename = "tmp/" + str(uuid.uuid4()) + ".tmp"
+        with open(temp_filename, "wb") as f:
             f.write(data)
-        self.options.filename = self.temp_filename 
+        self.options.filename = temp_filename
         self.open_files()
 
     def open_files(self):
@@ -190,6 +190,7 @@ class MftSession:
 
     def process_mft_file(self):
 
+        try:
         self.sizecheck()
 
         self.build_filepaths()
@@ -221,6 +222,14 @@ class MftSession:
                     self.do_output(record_ads)
 
             raw_record = self.file_mft.read(1024)
+
+            self.file_mft.close()
+            os.remove(self.options.filename)
+
+        except:
+            self.file_mft.close()
+            os.remove(self.options.filename)
+            raise
 
     def do_output(self, record):
         
